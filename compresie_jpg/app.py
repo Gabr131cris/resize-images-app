@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 from io import BytesIO
 from zipfile import ZipFile
+from pathlib import Path
 
 
 def compress_to_target(img, target_kb, progressive=True):
@@ -25,11 +26,11 @@ def compress_to_target(img, target_kb, progressive=True):
         last_size = size_kb
 
         if size_kb <= target_kb:
-            return buffer, quality, size_kb
+            return buffer, quality, size_kb, True
 
         quality -= 5
 
-    return last_buffer, quality, last_size
+    return last_buffer, quality, last_size, False
 
 
 def run():
@@ -48,6 +49,19 @@ def run():
     with col2:
         progressive = st.checkbox("Progressive JPEG", value=True)
 
+    show_details = st.checkbox("Afișează detalii imagini", value=False)
+
+    with st.expander("Opțional: redenumește imaginile la export", expanded=False):
+        enable_rename = st.checkbox("Activează redenumire", value=False)
+        rename_prefix = st.text_input("Nume bază", value="Imagine")
+        rename_start = st.number_input(
+            "Începe numerotarea de la",
+            min_value=1,
+            value=1,
+            step=1
+        )
+        rename_separator = st.text_input("Separator", value="_")
+
     files = st.file_uploader(
         "Selectează imagini",
         type=["jpg", "jpeg", "png", "webp"],
@@ -59,59 +73,102 @@ def run():
         return
 
     zip_buffer = BytesIO()
+    total_original = 0
+    total_final = 0
+
+    results = []
 
     with ZipFile(zip_buffer, "w") as zip_file:
-        for file in files:
+        for i, file in enumerate(files, start=int(rename_start)):
             original_size_kb = len(file.getvalue()) / 1024
+            total_original += original_size_kb
+
             img = Image.open(file)
 
-            compressed, quality, final_size = compress_to_target(
+            compressed, quality, final_size, success = compress_to_target(
                 img,
                 target_kb,
                 progressive
             )
 
+            total_final += final_size
+
             reduction = 100 - ((final_size / original_size_kb) * 100)
 
-            output_name = file.name.rsplit(".", 1)[0] + "_compressed.jpg"
+            if enable_rename:
+                output_name = f"{rename_prefix}{rename_separator}{i}.jpg"
+            else:
+                output_name = file.name.rsplit(".", 1)[0] + "_compressed.jpg"
 
             zip_file.writestr(output_name, compressed.getvalue())
 
-            st.divider()
-            st.write(f"### {file.name}")
-
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Original", f"{original_size_kb:.1f} KB")
-            c2.metric("Final", f"{final_size:.1f} KB")
-            c3.metric("Reducere", f"{reduction:.1f}%")
-            c4.metric("Quality", quality)
-
-            col_a, col_b = st.columns(2)
-
-            with col_a:
-                st.caption("Original")
-                st.image(img, use_container_width=True)
-
-            with col_b:
-                st.caption("Comprimat")
-                preview_img = Image.open(BytesIO(compressed.getvalue()))
-                st.image(preview_img, use_container_width=True)
-
-            st.download_button(
-                "Descarcă imaginea",
-                data=compressed.getvalue(),
-                file_name=output_name,
-                mime="image/jpeg",
-                key=output_name
-            )
+            results.append({
+                "old_name": file.name,
+                "new_name": output_name,
+                "original_size": original_size_kb,
+                "final_size": final_size,
+                "reduction": reduction,
+                "quality": quality,
+                "success": success,
+                "image": img,
+                "compressed": compressed.getvalue()
+            })
 
     zip_buffer.seek(0)
 
     st.divider()
 
+    total_reduction = 100 - ((total_final / total_original) * 100)
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Fișiere", len(files))
+    c2.metric("Total original", f"{total_original:.1f} KB")
+    c3.metric("Total final", f"{total_final:.1f} KB")
+    c4.metric("Reducere totală", f"{total_reduction:.1f}%")
+
+    st.divider()
+
+    for item in results:
+        status = "✅" if item["success"] else "⚠️"
+
+        if show_details:
+            with st.expander(f"{status} {item['old_name']} → {item['new_name']}", expanded=False):
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Original", f"{item['original_size']:.1f} KB")
+                c2.metric("Final", f"{item['final_size']:.1f} KB")
+                c3.metric("Reducere", f"{item['reduction']:.1f}%")
+                c4.metric("Quality", item["quality"])
+
+                col_a, col_b = st.columns(2)
+
+                with col_a:
+                    st.caption("Original")
+                    st.image(item["image"], use_container_width=True)
+
+                with col_b:
+                    st.caption("Comprimat")
+                    preview_img = Image.open(BytesIO(item["compressed"]))
+                    st.image(preview_img, use_container_width=True)
+
+                st.download_button(
+                    "Descarcă imaginea",
+                    data=item["compressed"],
+                    file_name=item["new_name"],
+                    mime="image/jpeg",
+                    key=item["new_name"]
+                )
+        else:
+            st.write(
+                f"{status} {item['old_name']} → {item['new_name']} | "
+                f"{item['original_size']:.1f} KB → {item['final_size']:.1f} KB | "
+                f"quality {item['quality']}"
+            )
+
+    st.divider()
+
     st.download_button(
         "Descarcă toate imaginile ZIP",
-        zip_buffer,
-        "imagini_compresate.zip",
-        "application/zip"
+        data=zip_buffer,
+        file_name="imagini_compresate.zip",
+        mime="application/zip"
     )

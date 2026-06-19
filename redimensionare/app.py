@@ -1,10 +1,21 @@
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageOps
 from io import BytesIO
 from zipfile import ZipFile
+from pathlib import Path
+import re
+
+
+def clean_filename(text):
+    text = text.strip()
+    text = re.sub(r'[<>:"/\\|?*]', "_", text)
+    text = re.sub(r"\s+", "_", text)
+    text = re.sub(r"_+", "_", text)
+    return text.strip("_")
 
 
 def resize_image(img, width=None, height=None, keep_ratio=True):
+    img = ImageOps.exif_transpose(img)
     original_width, original_height = img.size
 
     if keep_ratio:
@@ -15,27 +26,39 @@ def resize_image(img, width=None, height=None, keep_ratio=True):
             ratio = height / original_height
             width = int(original_width * ratio)
         elif width and height:
-            img.thumbnail((width, height))
-            return img
+            new_img = img.copy()
+            new_img.thumbnail((width, height), Image.LANCZOS)
+            return new_img
         else:
             return img
     else:
-        if not width:
-            width = original_width
-        if not height:
-            height = original_height
+        width = width or original_width
+        height = height or original_height
 
     return img.resize((int(width), int(height)), Image.LANCZOS)
 
 
-def image_to_bytes(img, image_format="JPEG", quality=90):
+def image_to_bytes(img, image_format="JPEG", quality=90, progressive=True):
     buffer = BytesIO()
 
     if image_format == "JPEG":
         img = img.convert("RGB")
-        img.save(buffer, format="JPEG", quality=quality, optimize=True)
+        img.save(
+            buffer,
+            format="JPEG",
+            quality=quality,
+            optimize=True,
+            progressive=progressive
+        )
+    elif image_format == "WEBP":
+        img.save(
+            buffer,
+            format="WEBP",
+            quality=quality,
+            method=6
+        )
     else:
-        img.save(buffer, format=image_format)
+        img.save(buffer, format="PNG", optimize=True)
 
     buffer.seek(0)
     return buffer
@@ -43,12 +66,6 @@ def image_to_bytes(img, image_format="JPEG", quality=90):
 
 def run():
     st.subheader("Redimensionare imagini")
-
-    uploaded_files = st.file_uploader(
-        "Alege una sau mai multe imagini",
-        type=["jpg", "jpeg", "png", "webp"],
-        accept_multiple_files=True
-    )
 
     col1, col2 = st.columns(2)
 
@@ -63,18 +80,58 @@ def run():
     output_format = st.selectbox("Format output", ["JPEG", "PNG", "WEBP"])
 
     quality = 90
+    progressive = True
+
     if output_format in ["JPEG", "WEBP"]:
         quality = st.slider("Calitate", 1, 100, 90)
+
+    if output_format == "JPEG":
+        progressive = st.checkbox("Progressive JPEG", value=True)
+
+    show_details = st.checkbox("Afișează detalii imagini", value=False)
+
+    with st.expander("Opțional: redenumește imaginile la export", expanded=False):
+        enable_rename = st.checkbox("Activează redenumire", value=False)
+        rename_prefix = st.text_input("Nume bază", value="Imagine")
+        rename_start = st.number_input(
+            "Începe numerotarea de la",
+            min_value=1,
+            value=1,
+            step=1
+        )
+        rename_separator = st.text_input("Separator", value="_")
+
+    uploaded_files = st.file_uploader(
+        "Alege una sau mai multe imagini",
+        type=["jpg", "jpeg", "png", "webp"],
+        accept_multiple_files=True
+    )
 
     if not uploaded_files:
         st.info("Încarcă imagini ca să începi.")
         return
 
+    if width == 0 and height == 0:
+        st.warning("Setează cel puțin lățimea sau înălțimea.")
+        return
+
+    rename_prefix = clean_filename(rename_prefix)
+    rename_separator = clean_filename(rename_separator)
+
     zip_buffer = BytesIO()
+    results = []
+
+    total_original_kb = 0
+    total_final_kb = 0
 
     with ZipFile(zip_buffer, "w") as zip_file:
-        for file in uploaded_files:
-            img = Image.open(file)
+        for i, file in enumerate(uploaded_files, start=int(rename_start)):
+            original_bytes = file.getvalue()
+            original_size_kb = len(original_bytes) / 1024
+            total_original_kb += original_size_kb
+
+            img = Image.open(BytesIO(original_bytes))
+            img = ImageOps.exif_transpose(img)
 
             new_img = resize_image(
                 img,
@@ -83,19 +140,98 @@ def run():
                 keep_ratio=keep_ratio
             )
 
-            img_bytes = image_to_bytes(new_img, output_format, quality)
+            img_bytes = image_to_bytes(
+                new_img,
+                output_format,
+                quality,
+                progressive
+            )
+
+            final_size_kb = len(img_bytes.getvalue()) / 1024
+            total_final_kb += final_size_kb
 
             extension = output_format.lower()
-            output_name = file.name.rsplit(".", 1)[0] + f"_redimensionat.{extension}"
+
+            if enable_rename:
+                output_name = f"{rename_prefix}{rename_separator}{i}.{extension}"
+            else:
+                output_name = file.name.rsplit(".", 1)[0] + f"_redimensionat.{extension}"
 
             zip_file.writestr(output_name, img_bytes.getvalue())
 
-            st.write(f"{file.name}: {img.size[0]}x{img.size[1]} → {new_img.size[0]}x{new_img.size[1]}")
+            reduction = 100 - ((final_size_kb / original_size_kb) * 100)
+
+            results.append({
+                "old_name": file.name,
+                "new_name": output_name,
+                "original_size": original_size_kb,
+                "final_size": final_size_kb,
+                "reduction": reduction,
+                "old_dimensions": img.size,
+                "new_dimensions": new_img.size,
+                "original_image": img,
+                "new_image_bytes": img_bytes.getvalue(),
+            })
 
     zip_buffer.seek(0)
 
+    st.divider()
+
+    total_reduction = 100 - ((total_final_kb / total_original_kb) * 100)
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Fișiere", len(uploaded_files))
+    c2.metric("Total original", f"{total_original_kb:.1f} KB")
+    c3.metric("Total final", f"{total_final_kb:.1f} KB")
+    c4.metric("Reducere totală", f"{total_reduction:.1f}%")
+
+    st.divider()
+
+    for item in results:
+        if show_details:
+            with st.expander(f"{item['old_name']} → {item['new_name']}", expanded=False):
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric(
+                    "Dimensiuni originale",
+                    f"{item['old_dimensions'][0]}×{item['old_dimensions'][1]}"
+                )
+                c2.metric(
+                    "Dimensiuni finale",
+                    f"{item['new_dimensions'][0]}×{item['new_dimensions'][1]}"
+                )
+                c3.metric("Original", f"{item['original_size']:.1f} KB")
+                c4.metric("Final", f"{item['final_size']:.1f} KB")
+
+                col_a, col_b = st.columns(2)
+
+                with col_a:
+                    st.caption("Original")
+                    st.image(item["original_image"], use_container_width=True)
+
+                with col_b:
+                    st.caption("Redimensionat")
+                    preview_img = Image.open(BytesIO(item["new_image_bytes"]))
+                    st.image(preview_img, use_container_width=True)
+
+                st.download_button(
+                    "Descarcă imaginea",
+                    data=item["new_image_bytes"],
+                    file_name=item["new_name"],
+                    mime=f"image/{output_format.lower()}",
+                    key=item["new_name"]
+                )
+        else:
+            st.write(
+                f"{item['old_name']} → {item['new_name']} | "
+                f"{item['old_dimensions'][0]}×{item['old_dimensions'][1]} → "
+                f"{item['new_dimensions'][0]}×{item['new_dimensions'][1]} | "
+                f"{item['original_size']:.1f} KB → {item['final_size']:.1f} KB"
+            )
+
+    st.divider()
+
     st.download_button(
-        label="Descarcă imaginile redimensionate ZIP",
+        label="Descarcă toate imaginile redimensionate ZIP",
         data=zip_buffer,
         file_name="imagini_redimensionate.zip",
         mime="application/zip"
