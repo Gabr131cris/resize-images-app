@@ -1,6 +1,3 @@
-Problema e aici: `return text.strip("_")` șterge separatorul `_`. Înlocuiește complet `rename/app.py` cu acesta:
-
-```python
 import streamlit as st
 from io import BytesIO
 from zipfile import ZipFile
