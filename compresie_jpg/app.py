@@ -4,8 +4,10 @@ from io import BytesIO
 from zipfile import ZipFile
 
 
-def compress_to_target(img, target_kb):
+def compress_to_target(img, target_kb, progressive=True):
     quality = 95
+    last_buffer = None
+    last_size = 0
 
     while quality >= 5:
         buffer = BytesIO()
@@ -15,28 +17,36 @@ def compress_to_target(img, target_kb):
             format="JPEG",
             quality=quality,
             optimize=True,
-            progressive=True
+            progressive=progressive
         )
 
         size_kb = len(buffer.getvalue()) / 1024
+        last_buffer = buffer
+        last_size = size_kb
 
         if size_kb <= target_kb:
             return buffer, quality, size_kb
 
         quality -= 5
 
-    return buffer, quality, size_kb
+    return last_buffer, quality, last_size
 
 
 def run():
-
     st.subheader("Compresie JPG după mărime")
 
-    target_kb = st.number_input(
-        "Mărime maximă fișier (KB)",
-        min_value=10,
-        value=300
-    )
+    col1, col2 = st.columns(2)
+
+    with col1:
+        target_kb = st.number_input(
+            "Mărime maximă fișier (KB)",
+            min_value=10,
+            value=300,
+            step=10
+        )
+
+    with col2:
+        progressive = st.checkbox("Progressive JPEG", value=True)
 
     files = st.file_uploader(
         "Selectează imagini",
@@ -45,41 +55,62 @@ def run():
     )
 
     if not files:
+        st.info("Încarcă una sau mai multe imagini.")
         return
 
     zip_buffer = BytesIO()
 
     with ZipFile(zip_buffer, "w") as zip_file:
-
         for file in files:
-
+            original_size_kb = len(file.getvalue()) / 1024
             img = Image.open(file)
 
             compressed, quality, final_size = compress_to_target(
                 img,
-                target_kb
+                target_kb,
+                progressive
             )
 
-            output_name = (
-                file.name.rsplit(".", 1)[0]
-                + "_compressed.jpg"
-            )
+            reduction = 100 - ((final_size / original_size_kb) * 100)
 
-            zip_file.writestr(
-                output_name,
-                compressed.getvalue()
-            )
+            output_name = file.name.rsplit(".", 1)[0] + "_compressed.jpg"
 
-            st.write(
-                f"{file.name} → "
-                f"{final_size:.1f} KB "
-                f"(quality {quality})"
+            zip_file.writestr(output_name, compressed.getvalue())
+
+            st.divider()
+            st.write(f"### {file.name}")
+
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("Original", f"{original_size_kb:.1f} KB")
+            c2.metric("Final", f"{final_size:.1f} KB")
+            c3.metric("Reducere", f"{reduction:.1f}%")
+            c4.metric("Quality", quality)
+
+            col_a, col_b = st.columns(2)
+
+            with col_a:
+                st.caption("Original")
+                st.image(img, use_container_width=True)
+
+            with col_b:
+                st.caption("Comprimat")
+                preview_img = Image.open(BytesIO(compressed.getvalue()))
+                st.image(preview_img, use_container_width=True)
+
+            st.download_button(
+                "Descarcă imaginea",
+                data=compressed.getvalue(),
+                file_name=output_name,
+                mime="image/jpeg",
+                key=output_name
             )
 
     zip_buffer.seek(0)
 
+    st.divider()
+
     st.download_button(
-        "Descarcă ZIP",
+        "Descarcă toate imaginile ZIP",
         zip_buffer,
         "imagini_compresate.zip",
         "application/zip"
