@@ -1,3 +1,6 @@
+Problema e aici: `return text.strip("_")` șterge separatorul `_`. Înlocuiește complet `rename/app.py` cu acesta:
+
+```python
 import streamlit as st
 from io import BytesIO
 from zipfile import ZipFile
@@ -5,12 +8,24 @@ from pathlib import Path
 import re
 
 
-def clean_filename(text):
+def clean_filename_part(text):
     text = text.strip()
     text = re.sub(r'[<>:"/\\|?*]', "_", text)
     text = re.sub(r"\s+", "_", text)
     text = re.sub(r"_+", "_", text)
     return text.strip("_")
+
+
+def clean_separator(text):
+    text = text.strip()
+
+    if text == "":
+        return ""
+
+    text = re.sub(r'[<>:"/\\|?*]', "_", text)
+    text = re.sub(r"\s+", "_", text)
+
+    return text
 
 
 def run():
@@ -52,15 +67,14 @@ def run():
         st.info("Încarcă imaginile pentru redenumire.")
         return
 
-    prefix = clean_filename(prefix)
-    separator = clean_filename(separator)
+    prefix = clean_filename_part(prefix)
+    separator = clean_separator(separator)
 
     if not prefix:
         st.error("Numele bază nu poate fi gol.")
         return
 
     zip_buffer = BytesIO()
-
     renamed_files = []
 
     with ZipFile(zip_buffer, "w") as zip_file:
@@ -100,3 +114,4 @@ def run():
         file_name="imagini_redenumite.zip",
         mime="application/zip"
     )
+
