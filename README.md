@@ -19,23 +19,39 @@ O poti testa aici : https://resize-images-app.streamlit.app/
 
 app/
 ├── main.py
+
 ├── requirements.txt
+
 ├── compresie_jpg/
+
 │   └── app.py
+
 ├── redimensionare/
+
 │   └── app.py
+
 ├── rename/
+
 │   └── app.py
+
 ├── convertor_format/
+
 │   └── app.py
+
 ├── watermark/
+
 │   └── app.py
+
 ├── crop_thumbnail/
+
 │   └── app.py
+
 └── pdf_din_imagini/
+
     └── app.py
 
-# Instalare locală
+
+## Instalare locală
 
 Ai nevoie de Python instalat.
 
@@ -62,11 +78,12 @@ requirements.txt
 streamlit
 pillow
 
-# Cum adaugi o aplicație nouă
+## Cum adaugi o aplicație nouă
 
 Creezi un folder nou în proiect:
 
 nume_aplicatie/
+
 └── app.py
 
 În app.py trebuie să existe funcția:
@@ -76,7 +93,7 @@ def run():
 
 main.py detectează automat folderele care conțin app.py și le adaugă în meniu.
 
-# Deploy online
+## Deploy online
 
 Aplicația poate fi hostată gratuit pe Streamlit Community Cloud.
 
