@@ -12,7 +12,10 @@ META_DESCRIPTION = (
     "Aplicație online gratuită pentru redimensionare imagini, compresie JPG, conversie JPG PNG WEBP, "
     "watermark, redenumire poze, crop thumbnail social media, PDF din imagini și metadata SEO produs."
 )
-GOOGLE_SITE_VERIFICATION = "google43a5607d9f9a5ae6"
+GOOGLE_SITE_VERIFICATIONS = [
+    "google43a5607d9f9a5ae6",
+    "D58qNq1QiMWQkpfNPLAoCDbbTmM5hb2N70Rm9hW0wMk",
+]
 META_KEYWORDS = [
     "redimensionare imagini online",
     "compresie jpg online",
@@ -60,7 +63,7 @@ def inject_seo_tags():
         "keywords": keywords,
         "url": APP_URL,
         "schema": schema,
-        "googleVerification": GOOGLE_SITE_VERIFICATION,
+        "googleVerifications": GOOGLE_SITE_VERIFICATIONS,
     })
 
     components.html(
@@ -91,7 +94,12 @@ def inject_seo_tags():
         upsertMeta('meta[name="description"]', {{name: 'description', content: seo.description}});
         upsertMeta('meta[name="keywords"]', {{name: 'keywords', content: seo.keywords}});
         upsertMeta('meta[name="robots"]', {{name: 'robots', content: 'index, follow'}});
-        upsertMeta('meta[name="google-site-verification"]', {{name: 'google-site-verification', content: seo.googleVerification}});
+        seo.googleVerifications.forEach((token) => {{
+            upsertMeta(
+                `meta[name="google-site-verification"][content="${token}"]`,
+                {{name: 'google-site-verification', content: token}}
+            );
+        }});
         upsertMeta('meta[property="og:title"]', {{property: 'og:title', content: seo.title}});
         upsertMeta('meta[property="og:description"]', {{property: 'og:description', content: seo.description}});
         upsertMeta('meta[property="og:type"]', {{property: 'og:type', content: 'website'}});
