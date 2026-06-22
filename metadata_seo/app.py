@@ -167,6 +167,13 @@ def build_csv(metadata, product_title):
 def run():
     st.subheader("Metadata / SEO produs + curățare EXIF")
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Generează câmpuri SEO pentru produse și poate curăța imaginile de EXIF/metadata.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Scrie titlul orientativ al produsului și completează categoria / beneficiile.")
+        st.markdown("2. Ajustează câmpurile generate dacă este nevoie.")
+        st.markdown("3. Descarcă CSV-ul SEO sau ZIP-ul cu imaginile fără metadata.")
+
     st.info(
         "Meta Titlu, Meta Descriere, Cuvinte Cheie și Etichete Produs se folosesc de obicei în platforma magazinului / codul paginii, "
         "nu direct pe imagine. Aici le poți genera rapid și poți curăța imaginile de EXIF/metadata."
