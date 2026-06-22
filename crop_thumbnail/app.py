@@ -112,6 +112,13 @@ def save_image(img, output_format, quality, progressive):
 def run():
     st.subheader("Crop / Social Media / Thumbnail Generator")
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Pregătește imagini pentru social media, marketplace sau thumbnail-uri folosind dimensiuni presetate.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă imaginile și alege presetul dorit.")
+        st.markdown("2. Alege crop complet sau fit cu fundal.")
+        st.markdown("3. Verifică preview-ul și descarcă ZIP-ul final.")
+
     files = st.file_uploader(
         "Selectează imaginile",
         type=["jpg", "jpeg", "png", "webp"],
@@ -185,7 +192,7 @@ def run():
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input("Separator", value="-")
 
     if not files:
         st.info("Încarcă imaginile pentru crop / thumbnail.")

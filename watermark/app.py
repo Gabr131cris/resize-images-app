@@ -160,6 +160,13 @@ def save_image(img, output_format, quality, progressive):
 def run():
     st.subheader("Watermark imagini")
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Aplică watermark text sau logo pe mai multe imagini odată.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă imaginile și alege watermark text sau logo.")
+        st.markdown("2. Setează poziția, mărimea, opacitatea, marginile și formatul final.")
+        st.markdown("3. Verifică rezultatele și descarcă ZIP-ul cu imaginile marcate.")
+
     files = st.file_uploader(
         "Selectează imaginile",
         type=["jpg", "jpeg", "png", "webp"],
@@ -292,7 +299,7 @@ def run():
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input("Separator", value="-")
 
     if not files:
         st.info("Încarcă imaginile pentru watermark.")

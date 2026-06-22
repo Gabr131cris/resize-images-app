@@ -67,6 +67,13 @@ def image_to_bytes(img, image_format="JPEG", quality=90, progressive=True):
 def run():
     st.subheader("Redimensionare imagini")
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Redimensionează imagini după lățime și/sau înălțime, cu păstrarea proporțiilor.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă imaginile și setează lățimea sau înălțimea dorită.")
+        st.markdown("2. Alege formatul, calitatea și redenumirea, dacă ai nevoie.")
+        st.markdown("3. Verifică detaliile și descarcă toate imaginile în ZIP.")
+
     col1, col2 = st.columns(2)
 
     with col1:
@@ -99,7 +106,7 @@ def run():
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input("Separator", value="-")
 
     uploaded_files = st.file_uploader(
         "Alege una sau mai multe imagini",
