@@ -36,6 +36,13 @@ def compress_to_target(img, target_kb, progressive=True):
 def run():
     st.subheader("Compresie JPG după mărime")
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Micșorează imaginile JPG până la o dimensiune maximă aleasă, util pentru site, marketplace sau email.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă una sau mai multe imagini.")
+        st.markdown("2. Alege mărimea maximă în KB și opțiunile de redenumire, dacă ai nevoie.")
+        st.markdown("3. Verifică rezultatele și descarcă arhiva ZIP.")
+
     col1, col2 = st.columns(2)
 
     with col1:
@@ -60,7 +67,7 @@ def run():
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input("Separator", value="-")
 
     files = st.file_uploader(
         "Selectează imagini",
