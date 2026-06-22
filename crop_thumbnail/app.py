@@ -4,6 +4,7 @@ from io import BytesIO
 from zipfile import ZipFile
 from pathlib import Path
 import re
+from ui_language import tr
 
 
 PRESETS = {
@@ -57,7 +58,7 @@ def crop_position_to_anchor(position):
 def process_image(img, width, height, mode, position, bg_color):
     img = ImageOps.exif_transpose(img).convert("RGB")
 
-    if mode == "Crop / umple formatul":
+    if mode == tr("Crop / fill format", "Crop / umple formatul"):
         return ImageOps.fit(
             img,
             (width, height),
@@ -110,38 +111,45 @@ def save_image(img, output_format, quality, progressive):
 
 
 def run():
-    st.subheader("Crop / Social Media / Thumbnail Generator")
+    st.subheader(tr("Crop / Social Media / Thumbnail Generator", "Crop / Social Media / Thumbnail Generator"))
+
+    with st.expander(tr("What this app does and how to use it", "Pentru ce se folosește și cum se utilizează"), expanded=False):
+        st.markdown(tr("**Use:** Prepares images for social media, marketplaces or thumbnails using size presets.", "**Utilizare:** Pregătește imagini pentru social media, marketplace sau thumbnail-uri folosind dimensiuni presetate."))
+        st.markdown(tr("**Quick steps:**", "**Pași rapizi:**"))
+        st.markdown(tr("1. Upload images and choose the desired preset.", "1. Încarcă imaginile și alege presetul dorit."))
+        st.markdown(tr("2. Choose crop fill or fit with background.", "2. Alege crop complet sau fit cu fundal."))
+        st.markdown(tr("3. Review the preview and download the final ZIP.", "3. Verifică preview-ul și descarcă ZIP-ul final."))
 
     files = st.file_uploader(
-        "Selectează imaginile",
+        tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],
         accept_multiple_files=True
     )
 
-    preset = st.selectbox("Preset mărime", list(PRESETS.keys()))
+    preset = st.selectbox(tr("Size preset", "Preset mărime"), list(PRESETS.keys()))
 
     if preset == "Custom":
         col1, col2 = st.columns(2)
         with col1:
-            width = st.number_input("Lățime px", min_value=1, value=1080, step=10)
+            width = st.number_input(tr("Width px", "Lățime px"), min_value=1, value=1080, step=10)
         with col2:
-            height = st.number_input("Înălțime px", min_value=1, value=1080, step=10)
+            height = st.number_input(tr("Height px", "Înălțime px"), min_value=1, value=1080, step=10)
     else:
         width, height = PRESETS[preset]
         st.info(f"Mărime selectată: {width}x{height}px")
 
     mode = st.radio(
-        "Mod procesare",
-        ["Crop / umple formatul", "Fit / păstrează toată imaginea"],
+        tr("Processing mode", "Mod procesare"),
+        [tr("Crop / fill format", "Crop / umple formatul"), tr("Fit / keep entire image", "Fit / păstrează toată imaginea")],
         horizontal=True
     )
 
     position = "Centru"
     bg_color = "#FFFFFF"
 
-    if mode == "Crop / umple formatul":
+    if mode == tr("Crop / fill format", "Crop / umple formatul"):
         position = st.selectbox(
-            "Zona importantă a imaginii",
+            tr("Important image area", "Zona importantă a imaginii"),
             [
                 "Centru",
                 "Sus",
@@ -155,47 +163,47 @@ def run():
             ]
         )
     else:
-        bg_color = st.color_picker("Culoare fundal pentru spațiile libere", "#FFFFFF")
+        bg_color = st.color_picker(tr("Background color for empty areas", "Culoare fundal pentru spațiile libere"), "#FFFFFF")
 
     st.divider()
 
     col1, col2 = st.columns(2)
 
     with col1:
-        output_format = st.selectbox("Format output", ["JPG", "PNG", "WEBP"])
+        output_format = st.selectbox(tr("Output format", "Format output"), ["JPG", "PNG", "WEBP"])
 
     with col2:
-        show_details = st.checkbox("Afișează detalii imagini", value=False)
+        show_details = st.checkbox(tr("Show image details", "Afișează detalii imagini"), value=False)
 
     quality = 90
     progressive = True
 
     if output_format in ["JPG", "WEBP"]:
-        quality = st.slider("Calitate export", 1, 100, 90)
+        quality = st.slider(tr("Export quality", "Calitate export"), 1, 100, 90)
 
     if output_format == "JPG":
-        progressive = st.checkbox("Progressive JPG", value=True)
+        progressive = st.checkbox(tr("Progressive JPG", "Progressive JPG"), value=True)
 
-    with st.expander("Opțional: redenumește imaginile la export", expanded=False):
-        enable_rename = st.checkbox("Activează redenumire", value=False)
-        rename_prefix = st.text_input("Nume bază", value="Imagine")
+    with st.expander(tr("Optional: rename images on export", "Opțional: redenumește imaginile la export"), expanded=False):
+        enable_rename = st.checkbox(tr("Enable renaming", "Activează redenumire"), value=False)
+        rename_prefix = st.text_input(tr("Base name", "Nume bază"), value="Imagine")
         rename_start = st.number_input(
-            "Începe numerotarea de la",
+            tr("Start numbering from", "Începe numerotarea de la"),
             min_value=1,
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input(tr("Separator", "Separator"), value="-")
 
     if not files:
-        st.info("Încarcă imaginile pentru crop / thumbnail.")
+        st.info(tr("Upload images for crop / thumbnail.", "Încarcă imaginile pentru crop / thumbnail."))
         return
 
     rename_prefix = clean_filename_part(rename_prefix)
     rename_separator = clean_separator(rename_separator)
 
     if enable_rename and not rename_prefix:
-        st.error("Numele bază nu poate fi gol.")
+        st.error(tr("Base name cannot be empty.", "Numele bază nu poate fi gol."))
         return
 
     zip_buffer = BytesIO()
@@ -258,9 +266,9 @@ def run():
     diff = 100 - ((total_final_kb / total_original_kb) * 100)
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Fișiere", len(files))
-    c2.metric("Total original", f"{total_original_kb:.1f} KB")
-    c3.metric("Total final", f"{total_final_kb:.1f} KB")
+    c1.metric(tr("Files", "Fișiere"), len(files))
+    c2.metric(tr("Original total", "Total original"), f"{total_original_kb:.1f} KB")
+    c3.metric(tr("Final total", "Total final"), f"{total_final_kb:.1f} KB")
     c4.metric("Diferență", f"{diff:.1f}%")
 
     st.divider()
@@ -270,11 +278,11 @@ def run():
             with st.expander(f"{item['old_name']} → {item['new_name']}", expanded=False):
                 c1, c2, c3, c4 = st.columns(4)
                 c1.metric(
-                    "Original",
+                    tr("Original", "Original"),
                     f"{item['original_dimensions'][0]}×{item['original_dimensions'][1]}"
                 )
                 c2.metric(
-                    "Final",
+                    tr("Final", "Final"),
                     f"{item['final_dimensions'][0]}×{item['final_dimensions'][1]}"
                 )
                 c3.metric("Size original", f"{item['original_size']:.1f} KB")
@@ -284,7 +292,7 @@ def run():
                 st.image(preview_img, use_container_width=True)
 
                 st.download_button(
-                    "Descarcă imaginea",
+                    tr("Download image", "Descarcă imaginea"),
                     data=item["final_bytes"],
                     file_name=item["new_name"],
                     mime=item["mime"],

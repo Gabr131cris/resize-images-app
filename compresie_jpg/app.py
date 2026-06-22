@@ -3,6 +3,7 @@ from PIL import Image
 from io import BytesIO
 from zipfile import ZipFile
 from pathlib import Path
+from ui_language import tr
 
 
 def compress_to_target(img, target_kb, progressive=True):
@@ -34,42 +35,49 @@ def compress_to_target(img, target_kb, progressive=True):
 
 
 def run():
-    st.subheader("Compresie JPG după mărime")
+    st.subheader(tr("JPG Compression by size", "Compresie JPG după mărime"))
+
+    with st.expander(tr("What this app does and how to use it", "Pentru ce se folosește și cum se utilizează"), expanded=False):
+        st.markdown(tr("**Use:** Reduces JPG images to a chosen maximum file size, useful for websites, marketplaces or email.", "**Utilizare:** Micșorează imaginile JPG până la o dimensiune maximă aleasă, util pentru site, marketplace sau email."))
+        st.markdown(tr("**Quick steps:**", "**Pași rapizi:**"))
+        st.markdown(tr("1. Upload one or more images.", "1. Încarcă una sau mai multe imagini."))
+        st.markdown(tr("2. Choose the maximum size in KB and rename options if needed.", "2. Alege mărimea maximă în KB și opțiunile de redenumire, dacă ai nevoie."))
+        st.markdown(tr("3. Review the results and download the ZIP archive.", "3. Verifică rezultatele și descarcă arhiva ZIP."))
 
     col1, col2 = st.columns(2)
 
     with col1:
         target_kb = st.number_input(
-            "Mărime maximă fișier (KB)",
+            tr("Maximum file size (KB)", "Mărime maximă fișier (KB)"),
             min_value=10,
             value=300,
             step=10
         )
 
     with col2:
-        progressive = st.checkbox("Progressive JPEG", value=True)
+        progressive = st.checkbox(tr("Progressive JPEG", "Progressive JPEG"), value=True)
 
-    show_details = st.checkbox("Afișează detalii imagini", value=False)
+    show_details = st.checkbox(tr("Show image details", "Afișează detalii imagini"), value=False)
 
-    with st.expander("Opțional: redenumește imaginile la export", expanded=False):
-        enable_rename = st.checkbox("Activează redenumire", value=False)
-        rename_prefix = st.text_input("Nume bază", value="Imagine")
+    with st.expander(tr("Optional: rename images on export", "Opțional: redenumește imaginile la export"), expanded=False):
+        enable_rename = st.checkbox(tr("Enable renaming", "Activează redenumire"), value=False)
+        rename_prefix = st.text_input(tr("Base name", "Nume bază"), value="Imagine")
         rename_start = st.number_input(
-            "Începe numerotarea de la",
+            tr("Start numbering from", "Începe numerotarea de la"),
             min_value=1,
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input(tr("Separator", "Separator"), value="-")
 
     files = st.file_uploader(
-        "Selectează imagini",
+        tr("Select images", "Selectează imagini"),
         type=["jpg", "jpeg", "png", "webp"],
         accept_multiple_files=True
     )
 
     if not files:
-        st.info("Încarcă una sau mai multe imagini.")
+        st.info(tr("Upload one or more images.", "Încarcă una sau mai multe imagini."))
         return
 
     zip_buffer = BytesIO()
@@ -121,9 +129,9 @@ def run():
     total_reduction = 100 - ((total_final / total_original) * 100)
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Fișiere", len(files))
-    c2.metric("Total original", f"{total_original:.1f} KB")
-    c3.metric("Total final", f"{total_final:.1f} KB")
+    c1.metric(tr("Files", "Fișiere"), len(files))
+    c2.metric(tr("Original total", "Total original"), f"{total_original:.1f} KB")
+    c3.metric(tr("Final total", "Total final"), f"{total_final:.1f} KB")
     c4.metric("Reducere totală", f"{total_reduction:.1f}%")
 
     st.divider()
@@ -134,15 +142,15 @@ def run():
         if show_details:
             with st.expander(f"{status} {item['old_name']} → {item['new_name']}", expanded=False):
                 c1, c2, c3, c4 = st.columns(4)
-                c1.metric("Original", f"{item['original_size']:.1f} KB")
-                c2.metric("Final", f"{item['final_size']:.1f} KB")
-                c3.metric("Reducere", f"{item['reduction']:.1f}%")
+                c1.metric(tr("Original", "Original"), f"{item['original_size']:.1f} KB")
+                c2.metric(tr("Final", "Final"), f"{item['final_size']:.1f} KB")
+                c3.metric(tr("Reduction", "Reducere"), f"{item['reduction']:.1f}%")
                 c4.metric("Quality", item["quality"])
 
                 col_a, col_b = st.columns(2)
 
                 with col_a:
-                    st.caption("Original")
+                    st.caption(tr("Original", "Original"))
                     st.image(item["image"], use_container_width=True)
 
                 with col_b:
@@ -151,7 +159,7 @@ def run():
                     st.image(preview_img, use_container_width=True)
 
                 st.download_button(
-                    "Descarcă imaginea",
+                    tr("Download image", "Descarcă imaginea"),
                     data=item["compressed"],
                     file_name=item["new_name"],
                     mime="image/jpeg",
