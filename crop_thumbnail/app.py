@@ -192,7 +192,7 @@ def run():
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input("Separator", value="-")
 
     if not files:
         st.info("Încarcă imaginile pentru crop / thumbnail.")

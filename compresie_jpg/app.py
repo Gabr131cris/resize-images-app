@@ -67,7 +67,7 @@ def run():
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input("Separator", value="-")
 
     files = st.file_uploader(
         "Selectează imagini",

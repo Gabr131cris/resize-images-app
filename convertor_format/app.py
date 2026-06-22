@@ -107,7 +107,7 @@ def run():
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input("Separator", value="-")
 
     show_details = st.checkbox("Afișează detalii imagini", value=False)
 

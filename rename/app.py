@@ -55,7 +55,7 @@ def run():
         )
 
     with col3:
-        separator = st.text_input("Separator", value="_")
+        separator = st.text_input("Separator", value="-")
 
     keep_original_extension = st.checkbox(
         "Păstrează extensia originală",
