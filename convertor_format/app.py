@@ -62,6 +62,13 @@ def convert_image(img, output_format, quality=90, progressive=True):
 def run():
     st.subheader("Convertor format imagini")
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Schimbă formatul imaginilor între JPG, PNG și WEBP, inclusiv pentru mai multe imagini odată.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă imaginile pe care vrei să le convertești.")
+        st.markdown("2. Alege formatul final și calitatea, dacă este cazul.")
+        st.markdown("3. Descarcă toate imaginile convertite într-un ZIP.")
+
     files = st.file_uploader(
         "Selectează imaginile",
         type=["jpg", "jpeg", "png", "webp"],

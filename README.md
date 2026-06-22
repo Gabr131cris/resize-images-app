@@ -65,6 +65,14 @@ Preset-uri pentru:
 * Thumbnail 1200px
 * Dimensiuni personalizate
 
+
+### 🧾 Metadata / SEO produs
+
+* Generare Meta Titlu, Meta Tag Descriere, Meta Tag Cuvinte Cheie și Etichete Produs
+* Export CSV pentru copiere/import în magazin online
+* Curățare EXIF/metadata din imagini
+* Redenumire SEO automată pentru imaginile de produs
+
 ### 📄 PDF din imagini
 
 * Conversie imagini în PDF
@@ -103,6 +111,9 @@ app/
 │   └── app.py
 │
 ├── crop_thumbnail/
+│   └── app.py
+│
+├── metadata_seo/
 │   └── app.py
 │
 └── pdf_din_imagini/
