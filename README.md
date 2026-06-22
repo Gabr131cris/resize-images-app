@@ -88,12 +88,31 @@ Toate uneltele permit procesarea simultană a mai multor imagini și exportarea 
 
 ---
 
+# 🔎 SEO aplicație
+
+Aplicația include optimizări SEO pentru versiunea online:
+
+* titlu de pagină optimizat pentru redimensionare, compresie, watermark și SEO imagini;
+* meta description și meta keywords pentru funcțiile principale;
+* canonical URL pentru demo-ul online;
+* Open Graph și Twitter Card pentru distribuire pe social media;
+* structured data `SoftwareApplication` cu lista funcțiilor aplicației;
+* text introductiv vizibil în aplicație pentru motoarele de căutare;
+* `robots.txt` și `sitemap.xml` în folderul `static/`.
+
+---
+
 # 📂 Structura proiectului
 
 ```text
 app/
 ├── main.py
 ├── requirements.txt
+├── .streamlit/
+│   └── config.toml
+├── static/
+│   ├── robots.txt
+│   └── sitemap.xml
 │
 ├── compresie_jpg/
 │   └── app.py
