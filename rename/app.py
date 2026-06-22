@@ -28,6 +28,13 @@ def clean_separator(text):
 def run():
     st.subheader("Rename imagini în serie")
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Redenumește rapid multe imagini cu prefix, separator și numerotare automată.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă imaginile pe care vrei să le redenumești.")
+        st.markdown("2. Setează numele de bază, separatorul și numărul de start.")
+        st.markdown("3. Verifică preview-ul și descarcă ZIP-ul cu numele noi.")
+
     files = st.file_uploader(
         "Selectează imaginile",
         type=["jpg", "jpeg", "png", "webp"],
@@ -48,7 +55,7 @@ def run():
         )
 
     with col3:
-        separator = st.text_input("Separator", value="_")
+        separator = st.text_input("Separator", value="-")
 
     keep_original_extension = st.checkbox(
         "Păstrează extensia originală",
