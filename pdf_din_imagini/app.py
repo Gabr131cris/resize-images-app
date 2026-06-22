@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image, ImageOps, ImageEnhance, ImageFilter
 from io import BytesIO
 from pathlib import Path
+from ui_language import tr
 
 
 def process_scan_effect(img, mode, contrast, sharpness, threshold):
@@ -53,7 +54,14 @@ def fit_to_page(img, page_size, margin):
 
 
 def run():
-    st.subheader("PDF din imagini / Scanner")
+    st.subheader(tr("Images to PDF / Scanner", "PDF din imagini / Scanner"))
+
+    with st.expander(tr("What this app does and how to use it", "Pentru ce se folosește și cum se utilizează"), expanded=False):
+        st.markdown(tr("**Use:** Turns images into a PDF and applies useful document-scan effects.", "**Utilizare:** Transformă imagini în PDF și aplică efecte utile pentru documente scanate."))
+        st.markdown(tr("**Quick steps:**", "**Pași rapizi:**"))
+        st.markdown(tr("1. Upload images in the desired PDF page order.", "1. Încarcă imaginile în ordinea dorită pentru paginile PDF."))
+        st.markdown(tr("2. Choose page size, DPI and processing mode.", "2. Alege formatul paginii, DPI-ul și modul de procesare."))
+        st.markdown(tr("3. Preview if needed, then download the PDF.", "3. Verifică preview-ul dacă vrei, apoi descarcă PDF-ul."))
 
     with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
         st.markdown("**Utilizare:** Transformă imagini în PDF și aplică efecte utile pentru documente scanate.")
@@ -63,13 +71,13 @@ def run():
         st.markdown("3. Verifică preview-ul dacă vrei, apoi descarcă PDF-ul.")
 
     files = st.file_uploader(
-        "Selectează imaginile",
+        tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],
         accept_multiple_files=True
     )
 
     page_preset = st.selectbox(
-        "Format pagină PDF",
+        tr("PDF page format", "Format pagină PDF"),
         [
             "A4 vertical",
             "A4 landscape",
@@ -78,10 +86,10 @@ def run():
         ]
     )
 
-    dpi = st.selectbox("DPI PDF", [72, 150, 200, 300], index=2)
+    dpi = st.selectbox(tr("PDF DPI", "DPI PDF"), [72, 150, 200, 300], index=2)
 
     scan_mode = st.selectbox(
-        "Mod procesare imagine",
+        tr("Image processing mode", "Mod procesare imagine"),
         [
             "Color normal",
             "Alb-negru / Grayscale",
@@ -93,22 +101,22 @@ def run():
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        contrast = st.slider("Contrast", 0.5, 3.0, 1.5, 0.1)
+        contrast = st.slider(tr("Contrast", "Contrast"), 0.5, 3.0, 1.5, 0.1)
 
     with col2:
-        sharpness = st.slider("Claritate", 0.5, 3.0, 1.4, 0.1)
+        sharpness = st.slider(tr("Sharpness", "Claritate"), 0.5, 3.0, 1.4, 0.1)
 
     with col3:
-        threshold = st.slider("Prag alb-negru", 0, 255, 170)
+        threshold = st.slider(tr("Black-white threshold", "Prag alb-negru"), 0, 255, 170)
 
-    margin = st.slider("Margine pagină px", 0, 200, 40)
+    margin = st.slider(tr("Page margin px", "Margine pagină px"), 0, 200, 40)
 
-    output_name = st.text_input("Nume PDF", value="document_scanat")
+    output_name = st.text_input(tr("PDF name", "Nume PDF"), value="document_scanat")
 
-    show_preview = st.checkbox("Afișează preview pagini", value=False)
+    show_preview = st.checkbox(tr("Show page preview", "Afișează preview pagini"), value=False)
 
     if not files:
-        st.info("Încarcă imaginile pentru PDF.")
+        st.info(tr("Upload images for PDF.", "Încarcă imaginile pentru PDF."))
         return
 
     page_sizes = {
@@ -147,10 +155,10 @@ def run():
 
     c1, c2 = st.columns(2)
     c1.metric("Imagini", len(files))
-    c2.metric("Pagini PDF", len(pages))
+    c2.metric(tr("PDF pages", "Pagini PDF"), len(pages))
 
     if show_preview:
-        with st.expander("Preview pagini PDF", expanded=True):
+        with st.expander(tr("PDF page preview", "Preview pagini PDF"), expanded=True):
             for page in pages:
                 st.write(page["name"])
                 st.image(page["image"], use_container_width=True)
@@ -176,7 +184,7 @@ def run():
     output_name = Path(output_name).stem + ".pdf"
 
     st.download_button(
-        "Descarcă PDF",
+        tr("Download PDF", "Descarcă PDF"),
         data=pdf_buffer,
         file_name=output_name,
         mime="application/pdf"

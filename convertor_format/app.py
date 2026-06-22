@@ -4,6 +4,7 @@ from io import BytesIO
 from zipfile import ZipFile
 from pathlib import Path
 import re
+from ui_language import tr
 
 
 def clean_filename_part(text):
@@ -60,7 +61,14 @@ def convert_image(img, output_format, quality=90, progressive=True):
 
 
 def run():
-    st.subheader("Convertor format imagini")
+    st.subheader(tr("Image Format Converter", "Convertor format imagini"))
+
+    with st.expander(tr("What this app does and how to use it", "Pentru ce se folosește și cum se utilizează"), expanded=False):
+        st.markdown(tr("**Use:** Converts images between JPG, PNG and WEBP, including bulk conversion.", "**Utilizare:** Schimbă formatul imaginilor între JPG, PNG și WEBP, inclusiv pentru mai multe imagini odată."))
+        st.markdown(tr("**Quick steps:**", "**Pași rapizi:**"))
+        st.markdown(tr("1. Upload the images you want to convert.", "1. Încarcă imaginile pe care vrei să le convertești."))
+        st.markdown(tr("2. Choose the output format and quality when available.", "2. Alege formatul final și calitatea, dacă este cazul."))
+        st.markdown(tr("3. Download all converted images in a ZIP.", "3. Descarcă toate imaginile convertite într-un ZIP."))
 
     with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
         st.markdown("**Utilizare:** Schimbă formatul imaginilor între JPG, PNG și WEBP, inclusiv pentru mai multe imagini odată.")
@@ -70,7 +78,7 @@ def run():
         st.markdown("3. Descarcă toate imaginile convertite într-un ZIP.")
 
     files = st.file_uploader(
-        "Selectează imaginile",
+        tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],
         accept_multiple_files=True
     )
@@ -79,13 +87,13 @@ def run():
 
     with col1:
         output_format = st.selectbox(
-            "Format output",
+            tr("Output format", "Format output"),
             ["JPG", "PNG", "WEBP"]
         )
 
     with col2:
         keep_original_name = st.checkbox(
-            "Păstrează numele original",
+            tr("Keep original name", "Păstrează numele original"),
             value=True
         )
 
@@ -93,33 +101,33 @@ def run():
     progressive = True
 
     if output_format in ["JPG", "WEBP"]:
-        quality = st.slider("Calitate", 1, 100, 90)
+        quality = st.slider(tr("Quality", "Calitate"), 1, 100, 90)
 
     if output_format == "JPG":
-        progressive = st.checkbox("Progressive JPG", value=True)
+        progressive = st.checkbox(tr("Progressive JPG", "Progressive JPG"), value=True)
 
-    with st.expander("Opțional: redenumește imaginile la export", expanded=False):
-        enable_rename = st.checkbox("Activează redenumire", value=False)
-        rename_prefix = st.text_input("Nume bază", value="Imagine")
+    with st.expander(tr("Optional: rename images on export", "Opțional: redenumește imaginile la export"), expanded=False):
+        enable_rename = st.checkbox(tr("Enable renaming", "Activează redenumire"), value=False)
+        rename_prefix = st.text_input(tr("Base name", "Nume bază"), value="Imagine")
         rename_start = st.number_input(
-            "Începe numerotarea de la",
+            tr("Start numbering from", "Începe numerotarea de la"),
             min_value=1,
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="-")
+        rename_separator = st.text_input(tr("Separator", "Separator"), value="-")
 
-    show_details = st.checkbox("Afișează detalii imagini", value=False)
+    show_details = st.checkbox(tr("Show image details", "Afișează detalii imagini"), value=False)
 
     if not files:
-        st.info("Încarcă imaginile pentru conversie.")
+        st.info(tr("Upload images for conversion.", "Încarcă imaginile pentru conversie."))
         return
 
     rename_prefix = clean_filename_part(rename_prefix)
     rename_separator = clean_separator(rename_separator)
 
     if enable_rename and not rename_prefix:
-        st.error("Numele bază nu poate fi gol.")
+        st.error(tr("Base name cannot be empty.", "Numele bază nu poate fi gol."))
         return
 
     zip_buffer = BytesIO()
@@ -177,9 +185,9 @@ def run():
     total_reduction = 100 - ((total_final_kb / total_original_kb) * 100)
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Fișiere", len(files))
-    c2.metric("Total original", f"{total_original_kb:.1f} KB")
-    c3.metric("Total final", f"{total_final_kb:.1f} KB")
+    c1.metric(tr("Files", "Fișiere"), len(files))
+    c2.metric(tr("Original total", "Total original"), f"{total_original_kb:.1f} KB")
+    c3.metric(tr("Final total", "Total final"), f"{total_final_kb:.1f} KB")
     c4.metric("Diferență", f"{total_reduction:.1f}%")
 
     st.divider()
@@ -188,15 +196,15 @@ def run():
         if show_details:
             with st.expander(f"{item['old_name']} → {item['new_name']}", expanded=False):
                 c1, c2, c3, c4 = st.columns(4)
-                c1.metric("Format original", item["old_format"].upper())
-                c2.metric("Format final", item["new_format"].upper())
-                c3.metric("Original", f"{item['original_size']:.1f} KB")
-                c4.metric("Final", f"{item['final_size']:.1f} KB")
+                c1.metric(tr("Original format", "Format original"), item["old_format"].upper())
+                c2.metric(tr("Final format", "Format final"), item["new_format"].upper())
+                c3.metric(tr("Original", "Original"), f"{item['original_size']:.1f} KB")
+                c4.metric(tr("Final", "Final"), f"{item['final_size']:.1f} KB")
 
                 st.image(item["image"], use_container_width=True)
 
                 st.download_button(
-                    "Descarcă imaginea",
+                    tr("Download image", "Descarcă imaginea"),
                     data=item["converted_bytes"],
                     file_name=item["new_name"],
                     mime=f"image/{item['new_format']}",
@@ -212,7 +220,7 @@ def run():
     st.divider()
 
     st.download_button(
-        "Descarcă toate imaginile convertite ZIP",
+        tr("Download all converted images ZIP", "Descarcă toate imaginile convertite ZIP"),
         data=zip_buffer,
         file_name="imagini_convertite.zip",
         mime="application/zip"

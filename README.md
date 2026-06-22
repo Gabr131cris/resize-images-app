@@ -82,6 +82,13 @@ Preset-uri pentru:
 * Îmbunătățire contrast
 * Îmbunătățire claritate
 
+
+### 🌍 Limbă / Language
+
+* Interfața pornește implicit în engleză.
+* În dreapta sus există un selector pentru schimbare rapidă între English și Română.
+* Textele principale de navigare și ghidurile scurte ale aplicațiilor se adaptează după limba aleasă.
+
 ### 📦 Procesare Bulk
 
 Toate uneltele permit procesarea simultană a mai multor imagini și exportarea rezultatelor într-un singur fișier ZIP sau PDF.

@@ -6,6 +6,7 @@ from zipfile import ZipFile
 
 import streamlit as st
 from PIL import Image, ImageOps
+from ui_language import tr
 
 
 STOP_WORDS = {
@@ -130,7 +131,7 @@ def remove_image_metadata(image_file, output_format, quality):
     img = ImageOps.exif_transpose(img)
 
     buffer = BytesIO()
-    if output_format == "Păstrează formatul original":
+    if output_format == tr("Keep original format", "Păstrează formatul original"):
         suffix = original_name.suffix.lower().replace(".", "")
         output_format = "JPEG" if suffix in ["jpg", "jpeg"] else suffix.upper()
     elif output_format == "JPG":
@@ -165,44 +166,44 @@ def build_csv(metadata, product_title):
 
 
 def run():
-    st.subheader("Metadata / SEO produs + curățare EXIF")
+    st.subheader(tr("Product Metadata / SEO + EXIF cleanup", "Metadata / SEO produs + curățare EXIF"))
 
-    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
-        st.markdown("**Utilizare:** Generează câmpuri SEO pentru produse și poate curăța imaginile de EXIF/metadata.")
-        st.markdown("**Pași rapizi:**")
-        st.markdown("1. Scrie titlul orientativ al produsului și completează categoria / beneficiile.")
-        st.markdown("2. Ajustează câmpurile generate dacă este nevoie.")
-        st.markdown("3. Descarcă CSV-ul SEO sau ZIP-ul cu imaginile fără metadata.")
+    with st.expander(tr("What this app does and how to use it", "Pentru ce se folosește și cum se utilizează"), expanded=False):
+        st.markdown(tr("**Use:** Generates product SEO fields and can remove EXIF/metadata from images.", "**Utilizare:** Generează câmpuri SEO pentru produse și poate curăța imaginile de EXIF/metadata."))
+        st.markdown(tr("**Quick steps:**", "**Pași rapizi:**"))
+        st.markdown(tr("1. Enter the product title and fill in category / benefits.", "1. Scrie titlul orientativ al produsului și completează categoria / beneficiile."))
+        st.markdown(tr("2. Adjust the generated fields if needed.", "2. Ajustează câmpurile generate dacă este nevoie."))
+        st.markdown(tr("3. Download the SEO CSV or the ZIP with metadata-free images.", "3. Descarcă CSV-ul SEO sau ZIP-ul cu imaginile fără metadata."))
 
-    st.info(
-        "Meta Titlu, Meta Descriere, Cuvinte Cheie și Etichete Produs se folosesc de obicei în platforma magazinului / codul paginii, "
-        "nu direct pe imagine. Aici le poți genera rapid și poți curăța imaginile de EXIF/metadata."
-    )
+    st.info(tr(
+        "Meta Title, Meta Description, Keywords and Product Tags are usually used in the store platform / page code, not directly on the image. Here you can generate them quickly and clean EXIF/metadata from images.",
+        "Meta Titlu, Meta Descriere, Cuvinte Cheie și Etichete Produs se folosesc de obicei în platforma magazinului / codul paginii, nu direct pe imagine. Aici le poți genera rapid și poți curăța imaginile de EXIF/metadata."
+    ))
 
     product_title = st.text_input(
-        "Titlu orientativ produs",
+        tr("Product title / draft title", "Titlu orientativ produs"),
         value="Masă Living Blat Ceramic DTW0801MC Bej",
     )
 
     col1, col2 = st.columns(2)
     with col1:
-        category = st.text_input("Categorie / tip produs", value="masă living")
-        title_suffix = st.text_input("Text pentru Meta Titlu", value="Eleganță și rafinament în design")
+        category = st.text_input(tr("Category / product type", "Categorie / tip produs"), value="masă living")
+        title_suffix = st.text_input(tr("Meta Title suffix", "Text pentru Meta Titlu"), value="Eleganță și rafinament în design")
     with col2:
         call_to_action = st.text_input(
-            "Call to action pentru descriere",
+            tr("Call to action for description", "Call to action pentru descriere"),
             value="Alege rafinamentul modern pentru casa ta!",
         )
-        tone = st.selectbox("Stil text", ["Comercial", "Scurt", "Premium"])
+        tone = st.selectbox(tr("Text style", "Stil text"), [tr("Commercial", "Comercial"), tr("Short", "Scurt"), tr("Premium", "Premium")])
 
     default_benefits = DEFAULT_BENEFITS.copy()
-    if tone == "Scurt":
+    if tone == tr("Short", "Scurt"):
         default_benefits = ["design modern", "ușor de integrat", "aspect elegant"]
-    elif tone == "Premium":
+    elif tone == tr("Premium", "Premium"):
         default_benefits = ["design rafinat", "finisaj premium", "prezență elegantă"]
 
     benefits_text = st.text_area(
-        "Beneficii / detalii produs (câte unul pe linie)",
+        tr("Benefits / product details (one per line)", "Beneficii / detalii produs (câte unul pe linie)"),
         value="\n".join(default_benefits),
         height=110,
     )
@@ -211,19 +212,19 @@ def run():
     col3, col4 = st.columns(2)
     with col3:
         extra_keywords = st.text_area(
-            "Cuvinte cheie extra, separate prin virgulă",
+            tr("Extra keywords, separated by comma", "Cuvinte cheie extra, separate prin virgulă"),
             value="mobilier dining elegant, masă design modern, masă ceramică bej",
             height=90,
         )
     with col4:
         extra_tags = st.text_area(
-            "Etichete extra, separate prin virgulă",
+            tr("Extra tags, separated by comma", "Etichete extra, separate prin virgulă"),
             value="mobilier modern, masă ceramică, masă bej, horeca",
             height=90,
         )
 
     if not clean_text(product_title):
-        st.error("Titlul produsului nu poate fi gol.")
+        st.error(tr("Product title cannot be empty.", "Titlul produsului nu poate fi gol."))
         return
 
     metadata = generate_metadata(
@@ -237,12 +238,12 @@ def run():
     )
 
     st.divider()
-    st.markdown("### Câmpuri generate")
+    st.markdown(tr("### Generated fields", "### Câmpuri generate"))
 
-    meta_title = st.text_area("Meta Titlu", value=metadata["meta_title"], height=80)
-    meta_description = st.text_area("Meta Tag Descriere", value=metadata["meta_description"], height=120)
-    meta_keywords = st.text_area("Meta Tag Cuvinte Cheie", value=metadata["meta_keywords"], height=120)
-    product_tags = st.text_area("Etichete Produs", value=metadata["product_tags"], height=100)
+    meta_title = st.text_area(tr("Meta Title", "Meta Titlu"), value=metadata["meta_title"], height=80)
+    meta_description = st.text_area(tr("Meta Tag Description", "Meta Tag Descriere"), value=metadata["meta_description"], height=120)
+    meta_keywords = st.text_area(tr("Meta Tag Keywords", "Meta Tag Cuvinte Cheie"), value=metadata["meta_keywords"], height=120)
+    product_tags = st.text_area(tr("Product Tags", "Etichete Produs"), value=metadata["product_tags"], height=100)
 
     final_metadata = {
         "meta_title": meta_title,
@@ -253,31 +254,31 @@ def run():
 
     csv_bytes = build_csv(final_metadata, clean_text(product_title))
     st.download_button(
-        "Descarcă SEO CSV",
+        tr("Download SEO CSV", "Descarcă SEO CSV"),
         data=csv_bytes,
         file_name=f"seo_{clean_filename_part(product_title)}.csv",
         mime="text/csv",
     )
 
     st.divider()
-    st.markdown("### Opțional: elimină metadata / EXIF din imagini")
+    st.markdown(tr("### Optional: remove metadata / EXIF from images", "### Opțional: elimină metadata / EXIF din imagini"))
 
     files = st.file_uploader(
-        "Selectează imaginile pentru curățare EXIF",
+        tr("Select images for EXIF cleanup", "Selectează imaginile pentru curățare EXIF"),
         type=["jpg", "jpeg", "png", "webp"],
         accept_multiple_files=True,
     )
 
     col5, col6, col7 = st.columns(3)
     with col5:
-        output_format = st.selectbox("Format imagine curățată", ["Păstrează formatul original", "JPG", "PNG", "WEBP"])
+        output_format = st.selectbox(tr("Cleaned image format", "Format imagine curățată"), [tr("Keep original format", "Păstrează formatul original"), "JPG", "PNG", "WEBP"])
     with col6:
-        quality = st.slider("Calitate JPG/WEBP", 1, 100, 90)
+        quality = st.slider(tr("JPG/WEBP quality", "Calitate JPG/WEBP"), 1, 100, 90)
     with col7:
-        rename_images = st.checkbox("Redenumește SEO imaginile", value=True)
+        rename_images = st.checkbox(tr("SEO rename images", "Redenumește SEO imaginile"), value=True)
 
     if not files:
-        st.info("Încarcă imagini doar dacă vrei să elimini EXIF/metadata.")
+        st.info(tr("Upload images only if you want to remove EXIF/metadata.", "Încarcă imagini doar dacă vrei să elimini EXIF/metadata."))
         return
 
     zip_buffer = BytesIO()
@@ -295,9 +296,9 @@ def run():
 
     zip_buffer.seek(0)
 
-    st.success(f"Am pregătit {len(files)} imagini fără EXIF/metadata și fișierul CSV SEO.")
+    st.success(tr(f"Prepared {len(files)} images without EXIF/metadata and the SEO CSV file.", f"Am pregătit {len(files)} imagini fără EXIF/metadata și fișierul CSV SEO."))
     st.download_button(
-        "Descarcă ZIP imagini curate + SEO CSV",
+        tr("Download ZIP with clean images + SEO CSV", "Descarcă ZIP imagini curate + SEO CSV"),
         data=zip_buffer,
         file_name=f"imagini_seo_{base_name}.zip",
         mime="application/zip",

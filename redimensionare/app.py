@@ -4,6 +4,7 @@ from io import BytesIO
 from zipfile import ZipFile
 from pathlib import Path
 import re
+from ui_language import tr
 
 
 def clean_filename(text):
@@ -65,7 +66,14 @@ def image_to_bytes(img, image_format="JPEG", quality=90, progressive=True):
 
 
 def run():
-    st.subheader("Redimensionare imagini")
+    st.subheader(tr("Resize Images", "Redimensionare imagini"))
+
+    with st.expander(tr("What this app does and how to use it", "Pentru ce se folosește și cum se utilizează"), expanded=False):
+        st.markdown(tr("**Use:** Resizes images by width and/or height while keeping proportions when needed.", "**Utilizare:** Redimensionează imagini după lățime și/sau înălțime, cu păstrarea proporțiilor."))
+        st.markdown(tr("**Quick steps:**", "**Pași rapizi:**"))
+        st.markdown(tr("1. Upload images and set the desired width or height.", "1. Încarcă imaginile și setează lățimea sau înălțimea dorită."))
+        st.markdown(tr("2. Choose format, quality and rename options if needed.", "2. Alege formatul, calitatea și redenumirea, dacă ai nevoie."))
+        st.markdown(tr("3. Review details and download all images in a ZIP.", "3. Verifică detaliile și descarcă toate imaginile în ZIP."))
 
     with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
         st.markdown("**Utilizare:** Redimensionează imagini după lățime și/sau înălțime, cu păstrarea proporțiilor.")
@@ -77,49 +85,49 @@ def run():
     col1, col2 = st.columns(2)
 
     with col1:
-        width = st.number_input("Lățime nouă px", min_value=0, value=1000, step=10)
+        width = st.number_input(tr("New width px", "Lățime nouă px"), min_value=0, value=1000, step=10)
 
     with col2:
-        height = st.number_input("Înălțime nouă px", min_value=0, value=0, step=10)
+        height = st.number_input(tr("New height px", "Înălțime nouă px"), min_value=0, value=0, step=10)
 
-    keep_ratio = st.checkbox("Păstrează proporțiile", value=True)
+    keep_ratio = st.checkbox(tr("Keep proportions", "Păstrează proporțiile"), value=True)
 
-    output_format = st.selectbox("Format output", ["JPEG", "PNG", "WEBP"])
+    output_format = st.selectbox(tr("Output format", "Format output"), ["JPEG", "PNG", "WEBP"])
 
     quality = 90
     progressive = True
 
     if output_format in ["JPEG", "WEBP"]:
-        quality = st.slider("Calitate", 1, 100, 90)
+        quality = st.slider(tr("Quality", "Calitate"), 1, 100, 90)
 
     if output_format == "JPEG":
-        progressive = st.checkbox("Progressive JPEG", value=True)
+        progressive = st.checkbox(tr("Progressive JPEG", "Progressive JPEG"), value=True)
 
-    show_details = st.checkbox("Afișează detalii imagini", value=False)
+    show_details = st.checkbox(tr("Show image details", "Afișează detalii imagini"), value=False)
 
-    with st.expander("Opțional: redenumește imaginile la export", expanded=False):
-        enable_rename = st.checkbox("Activează redenumire", value=False)
-        rename_prefix = st.text_input("Nume bază", value="Imagine")
+    with st.expander(tr("Optional: rename images on export", "Opțional: redenumește imaginile la export"), expanded=False):
+        enable_rename = st.checkbox(tr("Enable renaming", "Activează redenumire"), value=False)
+        rename_prefix = st.text_input(tr("Base name", "Nume bază"), value="Imagine")
         rename_start = st.number_input(
-            "Începe numerotarea de la",
+            tr("Start numbering from", "Începe numerotarea de la"),
             min_value=1,
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="-")
+        rename_separator = st.text_input(tr("Separator", "Separator"), value="-")
 
     uploaded_files = st.file_uploader(
-        "Alege una sau mai multe imagini",
+        tr("Choose one or more images", "Alege una sau mai multe imagini"),
         type=["jpg", "jpeg", "png", "webp"],
         accept_multiple_files=True
     )
 
     if not uploaded_files:
-        st.info("Încarcă imagini ca să începi.")
+        st.info(tr("Upload images to start.", "Încarcă imagini ca să începi."))
         return
 
     if width == 0 and height == 0:
-        st.warning("Setează cel puțin lățimea sau înălțimea.")
+        st.warning(tr("Set at least width or height.", "Setează cel puțin lățimea sau înălțimea."))
         return
 
     rename_prefix = clean_filename(rename_prefix)
@@ -187,9 +195,9 @@ def run():
     total_reduction = 100 - ((total_final_kb / total_original_kb) * 100)
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Fișiere", len(uploaded_files))
-    c2.metric("Total original", f"{total_original_kb:.1f} KB")
-    c3.metric("Total final", f"{total_final_kb:.1f} KB")
+    c1.metric(tr("Files", "Fișiere"), len(uploaded_files))
+    c2.metric(tr("Original total", "Total original"), f"{total_original_kb:.1f} KB")
+    c3.metric(tr("Final total", "Total final"), f"{total_final_kb:.1f} KB")
     c4.metric("Reducere totală", f"{total_reduction:.1f}%")
 
     st.divider()
@@ -206,13 +214,13 @@ def run():
                     "Dimensiuni finale",
                     f"{item['new_dimensions'][0]}×{item['new_dimensions'][1]}"
                 )
-                c3.metric("Original", f"{item['original_size']:.1f} KB")
-                c4.metric("Final", f"{item['final_size']:.1f} KB")
+                c3.metric(tr("Original", "Original"), f"{item['original_size']:.1f} KB")
+                c4.metric(tr("Final", "Final"), f"{item['final_size']:.1f} KB")
 
                 col_a, col_b = st.columns(2)
 
                 with col_a:
-                    st.caption("Original")
+                    st.caption(tr("Original", "Original"))
                     st.image(item["original_image"], use_container_width=True)
 
                 with col_b:
@@ -221,7 +229,7 @@ def run():
                     st.image(preview_img, use_container_width=True)
 
                 st.download_button(
-                    "Descarcă imaginea",
+                    tr("Download image", "Descarcă imaginea"),
                     data=item["new_image_bytes"],
                     file_name=item["new_name"],
                     mime=f"image/{output_format.lower()}",

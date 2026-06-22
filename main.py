@@ -5,6 +5,8 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
+from ui_language import render_language_switcher, tr
+
 BASE_DIR = Path(__file__).parent
 APP_URL = "https://resize-images-app.streamlit.app/"
 PAGE_TITLE = "Image Tools App - Redimensionare, Compresie, Watermark și SEO Imagini"
@@ -125,13 +127,22 @@ def inject_seo_tags():
 
 
 def show_seo_intro():
-    st.caption(
-        "Instrumente gratuite pentru imagini: redimensionare, compresie JPG, convertor JPG/PNG/WEBP, "
-        "watermark, rename bulk, thumbnail social media, PDF din imagini și SEO pentru produse."
-    )
+    st.caption(tr(
+        "Free image tools: resize images, JPG compression, JPG/PNG/WEBP converter, watermark, bulk rename, social media thumbnails, image-to-PDF and product SEO.",
+        "Instrumente gratuite pentru imagini: redimensionare, compresie JPG, convertor JPG/PNG/WEBP, watermark, rename bulk, thumbnail social media, PDF din imagini și SEO pentru produse."
+    ))
 
-    with st.expander("Ce poți face cu Image Tools App", expanded=False):
-        st.markdown(
+    with st.expander(tr("What you can do with Image Tools App", "Ce poți face cu Image Tools App"), expanded=False):
+        st.markdown(tr(
+            """
+            - Resize and compress images for websites, online stores or social media.
+            - Convert photos between JPG, PNG and WEBP.
+            - Apply text or logo watermarks in bulk.
+            - Rename images with SEO-friendly `-` separators.
+            - Create thumbnails for Instagram, TikTok, Facebook, Marketplace and YouTube.
+            - Convert images to PDF and use scanner-style processing.
+            - Generate product SEO metadata and remove EXIF/metadata from images.
+            """,
             """
             - Redimensionezi și comprimi imagini pentru site, magazin online sau social media.
             - Convertești poze între JPG, PNG și WEBP.
@@ -141,12 +152,16 @@ def show_seo_intro():
             - Transformi imagini în PDF și poți simula un mod scanner.
             - Generezi metadata SEO pentru produse și cureți EXIF/metadata din imagini.
             """
-        )
+        ))
 
 
 st.set_page_config(page_title=PAGE_TITLE, page_icon="🖼️", layout="wide")
 inject_seo_tags()
-st.title("Image Tools App")
+top_left, top_right = st.columns([4, 1])
+with top_right:
+    render_language_switcher()
+with top_left:
+    st.title("Image Tools App")
 show_seo_intro()
 
 apps = []
@@ -158,12 +173,22 @@ for folder in BASE_DIR.iterdir():
 apps = sorted(apps, key=lambda x: x.name.lower())
 
 if not apps:
-    st.warning("Nu există aplicații. Creează un folder cu fișier app.py în el.")
+    st.warning(tr("No apps found. Create a folder with an app.py file inside.", "Nu există aplicații. Creează un folder cu fișier app.py în el."))
     st.stop()
 
-app_names = [folder.name.replace("_", " ").title() for folder in apps]
+app_labels = {
+    "compresie_jpg": tr("JPG Compression", "Compresie Jpg"),
+    "convertor_format": tr("Format Converter", "Convertor Format"),
+    "crop_thumbnail": tr("Crop / Thumbnail", "Crop Thumbnail"),
+    "metadata_seo": tr("Metadata SEO", "Metadata Seo"),
+    "pdf_din_imagini": tr("Images to PDF", "Pdf Din Imagini"),
+    "redimensionare": tr("Resize Images", "Redimensionare"),
+    "rename": tr("Rename", "Rename"),
+    "watermark": tr("Watermark", "Watermark"),
+}
+app_names = [app_labels.get(folder.name, folder.name.replace("_", " ").title()) for folder in apps]
 
-selected_name = st.sidebar.radio("Alege aplicația", app_names)
+selected_name = st.sidebar.radio(tr("Choose app", "Alege aplicația"), app_names)
 selected_folder = apps[app_names.index(selected_name)]
 
 st.header(selected_name)
