@@ -168,13 +168,6 @@ def run():
         st.markdown(tr("2. Set position, size, opacity, margins and output format.", "2. Setează poziția, mărimea, opacitatea, marginile și formatul final."))
         st.markdown(tr("3. Review the results and download the ZIP with watermarked images.", "3. Verifică rezultatele și descarcă ZIP-ul cu imaginile marcate."))
 
-    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
-        st.markdown("**Utilizare:** Aplică watermark text sau logo pe mai multe imagini odată.")
-        st.markdown("**Pași rapizi:**")
-        st.markdown("1. Încarcă imaginile și alege watermark text sau logo.")
-        st.markdown("2. Setează poziția, mărimea, opacitatea, marginile și formatul final.")
-        st.markdown("3. Verifică rezultatele și descarcă ZIP-ul cu imaginile marcate.")
-
     files = st.file_uploader(
         tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],

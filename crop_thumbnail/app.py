@@ -120,13 +120,6 @@ def run():
         st.markdown(tr("2. Choose crop fill or fit with background.", "2. Alege crop complet sau fit cu fundal."))
         st.markdown(tr("3. Review the preview and download the final ZIP.", "3. Verifică preview-ul și descarcă ZIP-ul final."))
 
-    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
-        st.markdown("**Utilizare:** Pregătește imagini pentru social media, marketplace sau thumbnail-uri folosind dimensiuni presetate.")
-        st.markdown("**Pași rapizi:**")
-        st.markdown("1. Încarcă imaginile și alege presetul dorit.")
-        st.markdown("2. Alege crop complet sau fit cu fundal.")
-        st.markdown("3. Verifică preview-ul și descarcă ZIP-ul final.")
-
     files = st.file_uploader(
         tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],

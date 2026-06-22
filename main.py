@@ -98,7 +98,7 @@ def inject_seo_tags():
         upsertMeta('meta[name="robots"]', {{name: 'robots', content: 'index, follow'}});
         seo.googleVerifications.forEach((token) => {{
             upsertMeta(
-                `meta[name="google-site-verification"][content="${token}"]`,
+                `meta[name="google-site-verification"][content="${{token}}"]`,
                 {{name: 'google-site-verification', content: token}}
             );
         }});

@@ -63,13 +63,6 @@ def run():
         st.markdown(tr("2. Choose page size, DPI and processing mode.", "2. Alege formatul paginii, DPI-ul și modul de procesare."))
         st.markdown(tr("3. Preview if needed, then download the PDF.", "3. Verifică preview-ul dacă vrei, apoi descarcă PDF-ul."))
 
-    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
-        st.markdown("**Utilizare:** Transformă imagini în PDF și aplică efecte utile pentru documente scanate.")
-        st.markdown("**Pași rapizi:**")
-        st.markdown("1. Încarcă imaginile în ordinea dorită pentru paginile PDF.")
-        st.markdown("2. Alege formatul paginii, DPI-ul și modul de procesare.")
-        st.markdown("3. Verifică preview-ul dacă vrei, apoi descarcă PDF-ul.")
-
     files = st.file_uploader(
         tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],

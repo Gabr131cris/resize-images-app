@@ -75,13 +75,6 @@ def run():
         st.markdown(tr("2. Choose format, quality and rename options if needed.", "2. Alege formatul, calitatea și redenumirea, dacă ai nevoie."))
         st.markdown(tr("3. Review details and download all images in a ZIP.", "3. Verifică detaliile și descarcă toate imaginile în ZIP."))
 
-    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
-        st.markdown("**Utilizare:** Redimensionează imagini după lățime și/sau înălțime, cu păstrarea proporțiilor.")
-        st.markdown("**Pași rapizi:**")
-        st.markdown("1. Încarcă imaginile și setează lățimea sau înălțimea dorită.")
-        st.markdown("2. Alege formatul, calitatea și redenumirea, dacă ai nevoie.")
-        st.markdown("3. Verifică detaliile și descarcă toate imaginile în ZIP.")
-
     col1, col2 = st.columns(2)
 
     with col1:
