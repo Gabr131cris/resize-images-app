@@ -100,17 +100,24 @@ Aplicația include optimizări SEO pentru versiunea online:
 * text introductiv vizibil în aplicație pentru motoarele de căutare;
 * `robots.txt` și `sitemap.xml` în folderul `static/`.
 
+## Verificare Google Search Console
+
+Pentru Streamlit, fișierele din `static/` sunt servite la URL-uri de forma `/app/static/nume-fisier`, nu direct din rădăcina domeniului. De aceea, pentru verificarea Google este recomandată metoda **HTML tag**, iar aplicația include deja meta tag-ul `google-site-verification` în `<head>`. Fișierul HTML de verificare este păstrat și în repository ca fallback/documentație.
+
+
 ---
 
 # 📂 Structura proiectului
 
 ```text
 app/
+├── google43a5607d9f9a5ae6.html
 ├── main.py
 ├── requirements.txt
 ├── .streamlit/
 │   └── config.toml
 ├── static/
+│   ├── google43a5607d9f9a5ae6.html
 │   ├── robots.txt
 │   └── sitemap.xml
 │

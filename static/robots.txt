@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://resize-images-app.streamlit.app/static/sitemap.xml
+Sitemap: https://resize-images-app.streamlit.app/app/static/sitemap.xml
