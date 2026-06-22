@@ -65,6 +65,14 @@ Preset-uri pentru:
 * Thumbnail 1200px
 * Dimensiuni personalizate
 
+
+### 🧾 Metadata / SEO produs
+
+* Generare Meta Titlu, Meta Tag Descriere, Meta Tag Cuvinte Cheie și Etichete Produs
+* Export CSV pentru copiere/import în magazin online
+* Curățare EXIF/metadata din imagini
+* Redenumire SEO automată pentru imaginile de produs
+
 ### 📄 PDF din imagini
 
 * Conversie imagini în PDF
@@ -74,9 +82,35 @@ Preset-uri pentru:
 * Îmbunătățire contrast
 * Îmbunătățire claritate
 
+
+### 🌍 Limbă / Language
+
+* Interfața pornește implicit în engleză.
+* În dreapta sus există un selector pentru schimbare rapidă între English și Română.
+* Textele principale de navigare și ghidurile scurte ale aplicațiilor se adaptează după limba aleasă.
+
 ### 📦 Procesare Bulk
 
 Toate uneltele permit procesarea simultană a mai multor imagini și exportarea rezultatelor într-un singur fișier ZIP sau PDF.
+
+---
+
+# 🔎 SEO aplicație
+
+Aplicația include optimizări SEO pentru versiunea online:
+
+* titlu de pagină optimizat pentru redimensionare, compresie, watermark și SEO imagini;
+* meta description și meta keywords pentru funcțiile principale;
+* canonical URL pentru demo-ul online;
+* Open Graph și Twitter Card pentru distribuire pe social media;
+* structured data `SoftwareApplication` cu lista funcțiilor aplicației;
+* text introductiv vizibil în aplicație pentru motoarele de căutare;
+* `robots.txt` și `sitemap.xml` în folderul `static/`.
+
+## Verificare Google Search Console
+
+Pentru Streamlit, fișierele din `static/` sunt servite la URL-uri de forma `/app/static/nume-fisier`, nu direct din rădăcina domeniului. De aceea, pentru verificarea Google este recomandată metoda **HTML tag**, iar aplicația include deja meta tag-ul `google-site-verification` în `<head>`. Fișierul HTML de verificare este păstrat și în repository ca fallback/documentație.
+
 
 ---
 
@@ -84,8 +118,15 @@ Toate uneltele permit procesarea simultană a mai multor imagini și exportarea 
 
 ```text
 app/
+├── google43a5607d9f9a5ae6.html
 ├── main.py
 ├── requirements.txt
+├── .streamlit/
+│   └── config.toml
+├── static/
+│   ├── google43a5607d9f9a5ae6.html
+│   ├── robots.txt
+│   └── sitemap.xml
 │
 ├── compresie_jpg/
 │   └── app.py
@@ -103,6 +144,9 @@ app/
 │   └── app.py
 │
 ├── crop_thumbnail/
+│   └── app.py
+│
+├── metadata_seo/
 │   └── app.py
 │
 └── pdf_din_imagini/

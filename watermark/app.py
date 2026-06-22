@@ -4,6 +4,7 @@ from io import BytesIO
 from zipfile import ZipFile
 from pathlib import Path
 import re
+from ui_language import tr
 
 
 def clean_filename_part(text):
@@ -158,16 +159,23 @@ def save_image(img, output_format, quality, progressive):
 
 
 def run():
-    st.subheader("Watermark imagini")
+    st.subheader(tr("Image Watermark", tr("Image Watermark", "Watermark imagini")))
+
+    with st.expander(tr("What this app does and how to use it", "Pentru ce se folosește și cum se utilizează"), expanded=False):
+        st.markdown(tr("**Use:** Applies a text or logo watermark to multiple images at once.", "**Utilizare:** Aplică watermark text sau logo pe mai multe imagini odată."))
+        st.markdown(tr("**Quick steps:**", "**Pași rapizi:**"))
+        st.markdown(tr("1. Upload images and choose text or logo watermark.", "1. Încarcă imaginile și alege watermark text sau logo."))
+        st.markdown(tr("2. Set position, size, opacity, margins and output format.", "2. Setează poziția, mărimea, opacitatea, marginile și formatul final."))
+        st.markdown(tr("3. Review the results and download the ZIP with watermarked images.", "3. Verifică rezultatele și descarcă ZIP-ul cu imaginile marcate."))
 
     files = st.file_uploader(
-        "Selectează imaginile",
+        tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],
         accept_multiple_files=True
     )
 
     watermark_type = st.radio(
-        "Tip watermark",
+        tr("Watermark type", "Tip watermark"),
         ["Text", "Logo"],
         horizontal=True
     )
@@ -175,26 +183,26 @@ def run():
     st.divider()
 
     if watermark_type == "Text":
-        text = st.text_input("Text watermark", value="Watermark")
+        text = st.text_input(tr("Watermark text", "Text watermark"), value="Watermark")
 
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            font_size = st.slider("Mărime text", 8, 200, 48)
+            font_size = st.slider(tr("Text size", "Mărime text"), 8, 200, 48)
 
         with col2:
-            text_color = st.color_picker("Culoare text", "#FFFFFF")
+            text_color = st.color_picker(tr("Text color", "Culoare text"), "#FFFFFF")
 
         with col3:
-            text_opacity = st.slider("Opacitate text", 1, 100, 70)
+            text_opacity = st.slider(tr("Text opacity", "Opacitate text"), 1, 100, 70)
 
         col4, col5 = st.columns(2)
 
         with col4:
-            padding = st.slider("Spațiere fundal text", 0, 80, 16)
+            padding = st.slider(tr("Text background padding", "Spațiere fundal text"), 0, 80, 16)
 
         with col5:
-            bg_enabled = st.checkbox("Fundal sub text", value=True)
+            bg_enabled = st.checkbox(tr("Background under text", "Fundal sub text"), value=True)
 
         bg_color = "#000000"
         bg_opacity = 40
@@ -202,16 +210,16 @@ def run():
         if bg_enabled:
             col6, col7 = st.columns(2)
             with col6:
-                bg_color = st.color_picker("Culoare fundal", "#000000")
+                bg_color = st.color_picker(tr("Background color", "Culoare fundal"), "#000000")
             with col7:
-                bg_opacity = st.slider("Opacitate fundal", 1, 100, 40)
+                bg_opacity = st.slider(tr("Background opacity", "Opacitate fundal"), 1, 100, 40)
 
         logo_file = None
         logo_width_percent = None
 
     else:
         logo_file = st.file_uploader(
-            "Încarcă logo PNG/WebP/JPG",
+            tr("Upload PNG/WebP/JPG logo", "Încarcă logo PNG/WebP/JPG"),
             type=["png", "webp", "jpg", "jpeg"],
             accept_multiple_files=False
         )
@@ -220,14 +228,14 @@ def run():
 
         with col1:
             logo_width_percent = st.slider(
-                "Mărime logo (% din lățimea imaginii)",
+                tr("Logo size (% of image width)", "Mărime logo (% din lățimea imaginii)"),
                 1,
                 80,
                 15
             )
 
         with col2:
-            logo_opacity = st.slider("Opacitate logo", 1, 100, 70)
+            logo_opacity = st.slider(tr("Logo opacity", "Opacitate logo"), 1, 100, 70)
 
         text = ""
         font_size = 48
@@ -244,7 +252,7 @@ def run():
 
     with col_pos1:
         position = st.selectbox(
-            "Poziție",
+            tr("Position", "Poziție"),
             [
                 "Dreapta jos",
                 "Stânga jos",
@@ -259,58 +267,58 @@ def run():
         )
 
     with col_pos2:
-        margin_x = st.slider("Margine X", 0, 500, 40)
+        margin_x = st.slider(tr("Margin X", "Margine X"), 0, 500, 40)
 
     with col_pos3:
-        margin_y = st.slider("Margine Y", 0, 500, 40)
+        margin_y = st.slider(tr("Margin Y", "Margine Y"), 0, 500, 40)
 
     st.divider()
 
     col_out1, col_out2 = st.columns(2)
 
     with col_out1:
-        output_format = st.selectbox("Format output", ["JPG", "PNG", "WEBP"])
+        output_format = st.selectbox(tr("Output format", "Format output"), ["JPG", "PNG", "WEBP"])
 
     with col_out2:
-        show_details = st.checkbox("Afișează detalii imagini", value=False)
+        show_details = st.checkbox(tr("Show image details", "Afișează detalii imagini"), value=False)
 
     quality = 90
     progressive = True
 
     if output_format in ["JPG", "WEBP"]:
-        quality = st.slider("Calitate export", 1, 100, 90)
+        quality = st.slider(tr("Export quality", "Calitate export"), 1, 100, 90)
 
     if output_format == "JPG":
-        progressive = st.checkbox("Progressive JPG", value=True)
+        progressive = st.checkbox(tr("Progressive JPG", "Progressive JPG"), value=True)
 
-    with st.expander("Opțional: redenumește imaginile la export", expanded=False):
-        enable_rename = st.checkbox("Activează redenumire", value=False)
-        rename_prefix = st.text_input("Nume bază", value="Imagine")
+    with st.expander(tr("Optional: rename images on export", "Opțional: redenumește imaginile la export"), expanded=False):
+        enable_rename = st.checkbox(tr("Enable renaming", "Activează redenumire"), value=False)
+        rename_prefix = st.text_input(tr("Base name", "Nume bază"), value="Imagine")
         rename_start = st.number_input(
-            "Începe numerotarea de la",
+            tr("Start numbering from", "Începe numerotarea de la"),
             min_value=1,
             value=1,
             step=1
         )
-        rename_separator = st.text_input("Separator", value="_")
+        rename_separator = st.text_input(tr("Separator", "Separator"), value="-")
 
     if not files:
-        st.info("Încarcă imaginile pentru watermark.")
+        st.info(tr("Upload images for watermark.", "Încarcă imaginile pentru watermark."))
         return
 
     if watermark_type == "Text" and not text.strip():
-        st.error("Textul watermark nu poate fi gol.")
+        st.error(tr("Watermark text cannot be empty.", "Textul watermark nu poate fi gol."))
         return
 
     if watermark_type == "Logo" and not logo_file:
-        st.error("Încarcă un logo.")
+        st.error(tr("Upload a logo.", "Încarcă un logo."))
         return
 
     rename_prefix = clean_filename_part(rename_prefix)
     rename_separator = clean_separator(rename_separator)
 
     if enable_rename and not rename_prefix:
-        st.error("Numele bază nu poate fi gol.")
+        st.error(tr("Base name cannot be empty.", "Numele bază nu poate fi gol."))
         return
 
     if watermark_type == "Text":
@@ -389,9 +397,9 @@ def run():
     total_diff = 100 - ((total_final_kb / total_original_kb) * 100)
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Fișiere", len(files))
-    c2.metric("Total original", f"{total_original_kb:.1f} KB")
-    c3.metric("Total final", f"{total_final_kb:.1f} KB")
+    c1.metric(tr("Files", "Fișiere"), len(files))
+    c2.metric(tr("Original total", "Total original"), f"{total_original_kb:.1f} KB")
+    c3.metric(tr("Final total", "Total final"), f"{total_final_kb:.1f} KB")
     c4.metric("Diferență", f"{total_diff:.1f}%")
 
     if show_details:
@@ -400,14 +408,14 @@ def run():
         for item in results:
             with st.expander(f"{item['old_name']} → {item['new_name']}", expanded=False):
                 c1, c2 = st.columns(2)
-                c1.metric("Original", f"{item['original_size']:.1f} KB")
-                c2.metric("Final", f"{item['final_size']:.1f} KB")
+                c1.metric(tr("Original", "Original"), f"{item['original_size']:.1f} KB")
+                c2.metric(tr("Final", "Final"), f"{item['final_size']:.1f} KB")
 
                 preview_img = Image.open(BytesIO(item["final_bytes"]))
                 st.image(preview_img, use_container_width=True)
 
                 st.download_button(
-                    "Descarcă imaginea",
+                    tr("Download image", "Descarcă imaginea"),
                     data=item["final_bytes"],
                     file_name=item["new_name"],
                     mime=item["mime"],
