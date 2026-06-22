@@ -36,6 +36,13 @@ def run():
         st.markdown(tr("2. Set the base name, separator and start number.", "2. Setează numele de bază, separatorul și numărul de start."))
         st.markdown(tr("3. Review the preview and download the ZIP with new names.", "3. Verifică preview-ul și descarcă ZIP-ul cu numele noi."))
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Redenumește rapid multe imagini cu prefix, separator și numerotare automată.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă imaginile pe care vrei să le redenumești.")
+        st.markdown("2. Setează numele de bază, separatorul și numărul de start.")
+        st.markdown("3. Verifică preview-ul și descarcă ZIP-ul cu numele noi.")
+
     files = st.file_uploader(
         tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],

@@ -44,6 +44,13 @@ def run():
         st.markdown(tr("2. Choose the maximum size in KB and rename options if needed.", "2. Alege mărimea maximă în KB și opțiunile de redenumire, dacă ai nevoie."))
         st.markdown(tr("3. Review the results and download the ZIP archive.", "3. Verifică rezultatele și descarcă arhiva ZIP."))
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Micșorează imaginile JPG până la o dimensiune maximă aleasă, util pentru site, marketplace sau email.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă una sau mai multe imagini.")
+        st.markdown("2. Alege mărimea maximă în KB și opțiunile de redenumire, dacă ai nevoie.")
+        st.markdown("3. Verifică rezultatele și descarcă arhiva ZIP.")
+
     col1, col2 = st.columns(2)
 
     with col1:

@@ -70,6 +70,13 @@ def run():
         st.markdown(tr("2. Choose the output format and quality when available.", "2. Alege formatul final și calitatea, dacă este cazul."))
         st.markdown(tr("3. Download all converted images in a ZIP.", "3. Descarcă toate imaginile convertite într-un ZIP."))
 
+    with st.expander("Pentru ce se folosește și cum se utilizează", expanded=False):
+        st.markdown("**Utilizare:** Schimbă formatul imaginilor între JPG, PNG și WEBP, inclusiv pentru mai multe imagini odată.")
+        st.markdown("**Pași rapizi:**")
+        st.markdown("1. Încarcă imaginile pe care vrei să le convertești.")
+        st.markdown("2. Alege formatul final și calitatea, dacă este cazul.")
+        st.markdown("3. Descarcă toate imaginile convertite într-un ZIP.")
+
     files = st.file_uploader(
         tr("Select images", "Selectează imaginile"),
         type=["jpg", "jpeg", "png", "webp"],
